@@ -2,7 +2,7 @@
 package main
 
 import (
-	"book/tgpl/ch1/echoSeries/echo3"
+	"book/tgpl/src/ch1/echoSeries/echo3"
 )
 
 func main() {
