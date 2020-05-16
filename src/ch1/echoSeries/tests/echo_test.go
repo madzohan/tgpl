@@ -1,9 +1,9 @@
 package tests
 
 import (
-	"book/tgpl/src/ch1/echoSeries/echo1"
-	"book/tgpl/src/ch1/echoSeries/echo2"
-	"book/tgpl/src/ch1/echoSeries/echo3"
+	"ch1/echoSeries/echo1"
+	"ch1/echoSeries/echo2"
+	"ch1/echoSeries/echo3"
 	"io/ioutil"
 	"os"
 	"testing"

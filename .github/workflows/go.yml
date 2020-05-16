@@ -1,0 +1,35 @@
+name: Go
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.13
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+      
+    - name: Run Unit tests
+      working-directory: "/home/runner/work/tgpl/tgpl"
+      run: |
+        export GOPATH="$GOPATH":"$PWD"
+        go test -v -cover -covermode=atomic -coverpkg=./... -tags test ch1/echoSeries/tests -coverprofile=coverage.txt ./...
+
+    - name: Codecov
+      uses: codecov/codecov-action@v1.0.7
+      with:
+        token: ${{secrets.CODECOV_TOKEN}}
+        file: ./coverage.txt
