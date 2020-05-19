@@ -1,4 +1,4 @@
-package echo_exercise1
+package exercise1_1
 
 import (
 	"fmt"

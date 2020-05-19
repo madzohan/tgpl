@@ -4,8 +4,8 @@ import (
 	"ch1/echoSeries/echo1"
 	"ch1/echoSeries/echo2"
 	"ch1/echoSeries/echo3"
-	"ch1/echoSeries/echo_exercise1"
-	"ch1/echoSeries/echo_exercise2"
+	"ch1/echoSeries/exercise1.1"
+	"ch1/echoSeries/exercise1.2"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -42,7 +42,7 @@ func TestPrint(t *testing.T) {
 	expected = "program: exercise1, args: Cool, it works!\n"
 	t.Run("exercise1", func(t *testing.T) {
 		r, w := setUp(inArgs)
-		echo_exercise1.Print()
+		exercise1_1.Print()
 		tearDown(t, r, w, expected)
 	})
 
@@ -54,7 +54,7 @@ func TestPrint(t *testing.T) {
 		"index: 3, value: works!\n"
 	t.Run("exercise2", func(t *testing.T) {
 		r, w := setUp(inArgs)
-		echo_exercise2.Print()
+		exercise1_2.Print()
 		tearDown(t, r, w, expected)
 	})
 }
