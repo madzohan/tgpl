@@ -1,12 +1,13 @@
 package tests
 
 import (
+	"bytes"
 	"ch1/echoSeries/echo1"
 	"ch1/echoSeries/echo2"
 	"ch1/echoSeries/echo3"
 	"ch1/echoSeries/exercise1.1"
 	"ch1/echoSeries/exercise1.2"
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 )
@@ -22,9 +23,16 @@ func setUp(inArgs []string) (reader *os.File, writer *os.File) {
 
 func tearDown(c testing.TB, reader *os.File, writer *os.File, expected string) {
 	os.Args, os.Stdout = osArgs, osStdout
+	// https://stackoverflow.com/a/10476304/3033586
+	// copy the output in a separate goroutine so printing can't block indefinitely
+	outC := make(chan string)
+	go func() {
+		var buf bytes.Buffer
+		_, _ = io.Copy(&buf, reader)
+		outC <- buf.String()
+	}()
 	_ = writer.Close()
-	out, _ := ioutil.ReadAll(reader)
-	got := string(out)
+	got := <-outC
 	if expected != got {
 		c.Errorf("expected in output = %s; got %s", expected, got)
 	}
