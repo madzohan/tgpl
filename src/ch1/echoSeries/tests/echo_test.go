@@ -66,11 +66,3 @@ func BenchmarkEcho(b *testing.B) {
 	b.Run("echo2", func(b *testing.B) { r, w := setUp(inArgs); echo2.Print(); tearDown(b, r, w, expected) })
 	b.Run("echo3", func(b *testing.B) { r, w := setUp(inArgs); echo3.Print(); tearDown(b, r, w, expected) })
 }
-
-//func BenchmarkEcho2(b *testing.B) {
-//	b.Run
-//}
-//
-//func BenchmarkEcho3(b *testing.B) {
-//	b.Run
-//}
