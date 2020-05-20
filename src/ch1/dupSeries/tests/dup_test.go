@@ -14,11 +14,11 @@ func TestFindDuplicateLines(t *testing.T) {
 	stdin.WriteString("same_line\n")
 	stdin.WriteString("another_line\n")
 	stdin.WriteString("same_line\n")
-	expected := "same_line: 3"
+	expO := "same_line: 3"
 
-	t.Run("echo1", func(t *testing.T) {
-		r, w := std.SetUp([]string{})
+	t.Run("dup1", func(t *testing.T) {
+		or, ow, er, ew := std.SetUp([]string{})
 		dup1.FindDuplicateLines(stdin)
-		std.TearDown(t, r, w, expected)
+		std.TearDown(t, or, ow, er, ew, expO, "")
 	})
 }
