@@ -9,26 +9,38 @@ import (
 
 var osArgs, osStdout = os.Args, os.Stdout
 
-func SetUp(inArgs []string) (reader *os.File, writer *os.File) {
-	reader, writer, _ = os.Pipe()
-	os.Stdout = writer
+func SetUp(inArgs []string) (outReader *os.File, outWriter *os.File, errReader *os.File, errWriter *os.File) {
+	outReader, outWriter, _ = os.Pipe()
+	errReader, errWriter, _ = os.Pipe()
+	os.Stdout = outWriter
+	os.Stderr = errWriter
 	os.Args = inArgs
-	return reader, writer
+	return outReader, outWriter, errReader, errWriter
 }
 
-func TearDown(c testing.TB, reader *os.File, writer *os.File, expected string) {
-	os.Args, os.Stdout = osArgs, osStdout
+func TearDown(c testing.TB, outReader *os.File, outWriter *os.File,
+	errReader *os.File, errWriter *os.File, expectedOut string, expectedErr string) {
 	// https://stackoverflow.com/a/10476304/3033586
 	// copy the output in a separate goroutine so printing can't block indefinitely
-	outC := make(chan string)
-	go func() {
-		var buf bytes.Buffer
-		_, _ = io.Copy(&buf, reader)
-		outC <- buf.String()
-	}()
-	_ = writer.Close()
-	got := <-outC
-	if expected != got {
-		c.Errorf("expected in output = %s; got %s", expected, got)
+	outChan := make(chan string)
+	errChan := make(chan string)
+	chanMap := map[chan string][]interface{}{
+		outChan: {[]*os.File{outWriter, outReader}, expectedOut},
+		errChan: {[]*os.File{errWriter, errReader}, expectedErr},
 	}
+	for stdChan, i := range chanMap {
+		writer, reader := i[0].([]*os.File)[0], i[0].([]*os.File)[1]
+		expected := i[1].(string)
+		go func(reader *os.File, stdChan chan string) {
+			var buf bytes.Buffer
+			_, _ = io.Copy(&buf, reader)
+			stdChan <- buf.String()
+		}(reader, stdChan)
+		_ = writer.Close()
+		got := <-stdChan
+		if expected != got {
+			c.Errorf("expected %s; got %s", expected, got)
+		}
+	}
+	os.Args, os.Stdout = osArgs, osStdout
 }
