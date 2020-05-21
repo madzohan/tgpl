@@ -20,8 +20,6 @@ func SetUp(inArgs []string) (outReader *os.File, outWriter *os.File, errReader *
 
 func TearDown(c testing.TB, outReader *os.File, outWriter *os.File,
 	errReader *os.File, errWriter *os.File, expectedOut string, expectedErr string) {
-	// https://stackoverflow.com/a/10476304/3033586
-	// copy the output in a separate goroutine so printing can't block indefinitely
 	outChan := make(chan string)
 	errChan := make(chan string)
 	chanMap := map[chan string][]interface{}{
@@ -32,6 +30,8 @@ func TearDown(c testing.TB, outReader *os.File, outWriter *os.File,
 		writer, reader := i[0].([]*os.File)[0], i[0].([]*os.File)[1]
 		expected := i[1].(string)
 		expectedPrefix := i[2].(string)
+		// https://stackoverflow.com/a/10476304/3033586
+		// copy the output in a separate goroutine so printing can't block indefinitely
 		go func(reader *os.File, stdChan chan string) {
 			var buf bytes.Buffer
 			_, _ = io.Copy(&buf, reader)
