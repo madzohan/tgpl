@@ -25,12 +25,13 @@ func TearDown(c testing.TB, outReader *os.File, outWriter *os.File,
 	outChan := make(chan string)
 	errChan := make(chan string)
 	chanMap := map[chan string][]interface{}{
-		outChan: {[]*os.File{outWriter, outReader}, expectedOut},
-		errChan: {[]*os.File{errWriter, errReader}, expectedErr},
+		outChan: {[]*os.File{outWriter, outReader}, expectedOut, "StdOut"},
+		errChan: {[]*os.File{errWriter, errReader}, expectedErr, "StdErr"},
 	}
 	for stdChan, i := range chanMap {
 		writer, reader := i[0].([]*os.File)[0], i[0].([]*os.File)[1]
 		expected := i[1].(string)
+		expectedPrefix := i[2].(string)
 		go func(reader *os.File, stdChan chan string) {
 			var buf bytes.Buffer
 			_, _ = io.Copy(&buf, reader)
@@ -39,7 +40,7 @@ func TearDown(c testing.TB, outReader *os.File, outWriter *os.File,
 		_ = writer.Close()
 		got := <-stdChan
 		if expected != got {
-			c.Errorf("expected %s; got %s", expected, got)
+			c.Errorf("%s expected %s; got %s", expectedPrefix, expected, got)
 		}
 	}
 	os.Args, os.Stdout = osArgs, osStdout

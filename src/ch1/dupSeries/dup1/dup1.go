@@ -16,7 +16,7 @@ func FindDuplicateLines(reader io.Reader) {
 	}
 	for line, count := range stats {
 		if count > 1 {
-			fmt.Printf("%s: %x", line, count)
+			fmt.Printf("line: %s, count: %x", line, count)
 		}
 	}
 }
