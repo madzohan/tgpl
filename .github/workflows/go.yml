@@ -26,7 +26,7 @@ jobs:
       working-directory: "/home/runner/work/tgpl/tgpl"
       run: |
         export GOPATH="$GOPATH":"$PWD"
-        go test -v -cover -covermode=atomic -coverpkg=./... -tags test ch1/echoSeries/tests -coverprofile=coverage.txt ./...
+        go test -v -cover -covermode=atomic -coverpkg=./... -coverprofile=coverage.txt ./...
 
     - name: Codecov
       uses: codecov/codecov-action@v1.0.7
