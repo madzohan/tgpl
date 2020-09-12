@@ -3,10 +3,12 @@ package tests
 import (
 	"ch1/dupSeries/dup1"
 	"ch1/dupSeries/dup2"
-	"github.com/spf13/afero"
+	"ch1/dupSeries/dup3"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/spf13/afero"
 )
 
 var (
@@ -43,7 +45,8 @@ func TestFindDuplicateLines(t *testing.T) {
 	t.Run("dup2-files", func(t *testing.T) {
 		or, ow, er, ew := SetUp([]string{"dup2-files", "test1", "test2"})
 		dup2.FindDuplicateLines(FS, os.Stdin)
-		TearDown(t, or, ow, er, ew, expO, "")
+		TearDown(t, or, ow, er, ew,
+			"line: same_line, count: 3, filenames: test1, test2", "")
 	})
 
 	t.Run("dup2-files-stderr", func(t *testing.T) {
@@ -51,5 +54,25 @@ func TestFindDuplicateLines(t *testing.T) {
 		dup2.FindDuplicateLines(FS, os.Stdin)
 		TearDown(t, or, ow, er, ew, "",
 			"dup2: open file_not_exist: file does not exist")
+	})
+
+	stdinBuf = strings.NewReader(stdin)
+	t.Run("dup3-stdin", func(t *testing.T) {
+		or, ow, er, ew := SetUp([]string{"dup3-stdin"})
+		dup3.FindDuplicateLines(FS, stdinBuf)
+		TearDown(t, or, ow, er, ew, expO, "")
+	})
+
+	t.Run("dup3-files", func(t *testing.T) {
+		or, ow, er, ew := SetUp([]string{"dup3-files", "test1", "test2"})
+		dup3.FindDuplicateLines(FS, os.Stdin)
+		TearDown(t, or, ow, er, ew, expO, "")
+	})
+
+	t.Run("dup3-files-stderr", func(t *testing.T) {
+		or, ow, er, ew := SetUp([]string{"dup3-files", "file_not_exist"})
+		dup3.FindDuplicateLines(FS, os.Stdin)
+		TearDown(t, or, ow, er, ew, "",
+			"dup3: open file_not_exist: file does not exist\n")
 	})
 }
