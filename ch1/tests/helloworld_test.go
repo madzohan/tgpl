@@ -1,8 +1,8 @@
 package tests
 
 import (
-	"ch1/helloworld"
 	"testing"
+	"tgpl/ch1/helloworld"
 )
 
 func TestHelloWorldFunc(t *testing.T) {

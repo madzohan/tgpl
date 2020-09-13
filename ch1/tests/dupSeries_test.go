@@ -1,12 +1,12 @@
 package tests
 
 import (
-	"ch1/dupSeries/dup1"
-	"ch1/dupSeries/dup2"
-	"ch1/dupSeries/dup3"
 	"os"
 	"strings"
 	"testing"
+	"tgpl/ch1/dupSeries/dup1"
+	"tgpl/ch1/dupSeries/dup2"
+	"tgpl/ch1/dupSeries/dup3"
 
 	"github.com/spf13/afero"
 )
