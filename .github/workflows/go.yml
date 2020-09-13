@@ -21,19 +21,15 @@ jobs:
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
+    
+    - name: Get dependencies
+      run: go get -v -t -d ./...
       
     - name: Run Unit tests
-      run: |
-        mkdir -p /home/runner/work/go
-        cd /home/runner/work/go
-        export GOPATH="$GOPATH":"$PWD"
-        go get github.com/spf13/afero
-        cd /home/runner/work/tgpl/tgpl
-        export GOPATH="$GOPATH":"$PWD"
-        go test -v -cover -covermode=atomic -coverpkg=./... -coverprofile=coverage.txt ./...
+      run: go test -v -cover -covermode=atomic -coverpkg=./... -coverprofile=coverage.txt ./...
 
     - name: Codecov
-      uses: codecov/codecov-action@v1.0.7
+      uses: codecov/codecov-action@v1.0.13
       with:
         token: ${{secrets.CODECOV_TOKEN}}
         file: ./coverage.txt
