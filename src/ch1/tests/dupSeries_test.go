@@ -76,3 +76,42 @@ func TestFindDuplicateLines(t *testing.T) {
 			"dup3: open file_not_exist: file does not exist\n")
 	})
 }
+
+func BenchmarkFindDuplicateLines(b *testing.B) {
+	stdin := "same_line\nyet_another_line\nsame_line\nanother_line\nsame_line\n"
+	expO := "line: same_line, count: 3"
+
+	b.Run("dup1", func(b *testing.B) {
+		stdinBuf := strings.NewReader(stdin)
+		or, ow, er, ew := SetUp([]string{})
+		dup1.FindDuplicateLines(stdinBuf)
+		TearDown(b, or, ow, er, ew, expO, "")
+	})
+
+	b.Run("dup2-stdin", func(b *testing.B) {
+		stdinBuf := strings.NewReader(stdin)
+		or, ow, er, ew := SetUp([]string{"dup2-stdin"})
+		dup2.FindDuplicateLines(FS, stdinBuf)
+		TearDown(b, or, ow, er, ew, expO, "")
+	})
+
+	b.Run("dup3-stdin", func(b *testing.B) {
+		stdinBuf := strings.NewReader(stdin)
+		or, ow, er, ew := SetUp([]string{"dup3-stdin"})
+		dup3.FindDuplicateLines(FS, stdinBuf)
+		TearDown(b, or, ow, er, ew, expO, "")
+	})
+
+	b.Run("dup2-files", func(b *testing.B) {
+		or, ow, er, ew := SetUp([]string{"dup2-files", "test1", "test2"})
+		dup2.FindDuplicateLines(FS, os.Stdin)
+		TearDown(b, or, ow, er, ew,
+			"line: same_line, count: 3, filenames: test1, test2", "")
+	})
+
+	b.Run("dup3-files", func(b *testing.B) {
+		or, ow, er, ew := SetUp([]string{"dup3-files", "test1", "test2"})
+		dup3.FindDuplicateLines(FS, os.Stdin)
+		TearDown(b, or, ow, er, ew, expO, "")
+	})
+}
