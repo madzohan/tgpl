@@ -2,7 +2,8 @@ package tests
 
 import (
 	"testing"
-	"tgpl/ch1/helloworld"
+
+	"github.com/madzohan/tgpl/ch1/helloworld"
 )
 
 func TestHelloWorldFunc(t *testing.T) {
