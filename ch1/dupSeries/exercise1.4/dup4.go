@@ -17,7 +17,7 @@ var filePaths []string
 
 func walk(path string, info os.FileInfo, err error) error {
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "dup4: %v\n", err)
+		fmt.Fprintf(os.Stderr, "exercise1.4: %v\n", err)
 		return err
 	}
 	if !info.IsDir() {
