@@ -14,15 +14,18 @@ import (
 	"github.com/spf13/afero"
 )
 
-func scan(scanner bufio.Scanner, filename string, stats map[string][]interface{}) {
-	//map[line 1:[map[file 1:{} file 2:{} file 5:{}] map[0:453]]]
+type LineStats struct {
+	fileset interface{}
+	count   int
+}
+
+func scan(scanner bufio.Scanner, filename string, stats map[string]*LineStats) {
 	for scanner.Scan() {
 		line := scanner.Text()
-		if item, exist := stats[line]; exist {
-			lineCounter := item[1].(map[int]int)
-			lineCounter[0]++
+		if lineStats, exist := stats[line]; exist {
+			lineStats.count++
 			if filename != "" {
-				fileset := item[0].(map[string]struct{})
+				fileset := lineStats.fileset.(map[string]struct{})
 				if _, ok := fileset[filename]; !ok {
 					fileset[filename] = struct{}{}
 				}
@@ -30,9 +33,7 @@ func scan(scanner bufio.Scanner, filename string, stats map[string][]interface{}
 		} else {
 			fileset := make(map[string]struct{})
 			fileset[filename] = struct{}{}
-			lineCounter := make(map[int]int)
-			lineCounter[0]++
-			stats[line] = []interface{}{fileset, lineCounter}
+			stats[line] = &LineStats{fileset: fileset, count: 1}
 		}
 	}
 }
@@ -48,47 +49,47 @@ func getFileScanner(reader afero.File) (scanner *bufio.Scanner, filename string)
 	return scanner, filename
 }
 
-func printStats(stats map[string][]interface{}) {
-	for line, item := range stats {
-		lineCounter := item[1].(map[int]int)
-		if lineCounter[0] > 1 {
-			fileset := item[0].(map[string]struct{})
-			filesetSorted := make([]string, len(fileset))
-			i := 0
+func PrintStats(stats map[string]*LineStats) {
+	for line, linestats := range stats {
+		if linestats.count > 1 {
+			fileset := linestats.fileset.(map[string]struct{})
+			filenamesSorted := []string{}
 			for key := range fileset {
-				filesetSorted[i] = key
-				i++
+				filenamesSorted = append(filenamesSorted, key)
 			}
-			sort.Strings(filesetSorted)
-			filenames := strings.Join(filesetSorted, ", ")
+			sort.Strings(filenamesSorted)
+			filenames := strings.Join(filenamesSorted, ", ")
 			if filenames != "" {
-				// exercise 1.4
-				fmt.Printf("line: %s, count: %x, filenames: %s", line, lineCounter[0], filenames)
+				fmt.Printf("\nline: %s, count: %x, filenames: %s", line, linestats.count, filenames)
 			} else {
-				fmt.Printf("line: %s, count: %x", line, lineCounter[0])
+				fmt.Printf("\nline: %s, count: %x", line, linestats.count)
 			}
 
 		}
 	}
 }
 
-func FindDuplicateLines(FS afero.Fs, reader io.Reader) {
-	stats := make(map[string][]interface{})
-	files := os.Args[1:]
-	if len(files) == 0 {
+func PopulateLineStats(filenames []string, FS afero.Fs, reader io.Reader, lineStats map[string]*LineStats) {
+	if len(filenames) == 0 {
 		scanner := getStdScanner(reader)
-		scan(*scanner, "", stats)
+		scan(*scanner, "", lineStats)
 	} else {
-		for _, filename := range files {
+		for _, filename := range filenames {
 			file, err := FS.Open(filename)
 			if err != nil {
-				_, _ = fmt.Fprintf(os.Stderr, "dup2: %v", err)
+				_, _ = fmt.Fprintf(os.Stderr, "dup: %v", err)
 				continue
 			}
 			scanner, filename := getFileScanner(file)
-			scan(*scanner, filename, stats)
+			scan(*scanner, filename, lineStats)
 			_ = file.Close()
 		}
 	}
-	printStats(stats)
+}
+
+func FindDuplicateLines(FS afero.Fs, reader io.Reader) {
+	filenames := os.Args[1:]
+	lineStats := make(map[string]*LineStats)
+	PopulateLineStats(filenames, FS, reader, lineStats)
+	PrintStats(lineStats)
 }

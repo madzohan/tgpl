@@ -3,3 +3,5 @@ bin
 coverage.txt
 cover.out
 *.test
+.lh
+.vscode
