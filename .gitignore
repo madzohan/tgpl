@@ -1,7 +1,10 @@
 .idea
 bin
-coverage.txt
+coverage.*
 cover.out
 *.test
 .lh
 .vscode
+vendor
+*_run
+*.gif
