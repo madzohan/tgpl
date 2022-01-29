@@ -9,28 +9,7 @@ import (
 	"github.com/madzohan/tgpl/ch1/dupSeries/dup2"
 	"github.com/madzohan/tgpl/ch1/dupSeries/dup3"
 	exercise1_4 "github.com/madzohan/tgpl/ch1/dupSeries/exercise1.4"
-
-	"github.com/spf13/afero"
 )
-
-var (
-	FS     afero.Fs
-	FSUtil *afero.Afero
-)
-
-func init() {
-	FS = afero.NewMemMapFs()
-	FSUtil = &afero.Afero{Fs: FS}
-
-	FSUtil.WriteFile("test1", []byte("same_line\nyet_another_line\nsame_line\nanother_line\n"), 0644)
-	FSUtil.WriteFile("test2", []byte("same_line\n"), 0644)
-
-	FSUtil.MkdirAll("testdir1/td2", 0644)
-	FSUtil.MkdirAll("testdir2/td2", 0644)
-	FSUtil.WriteFile("testdir1/f1", []byte("same_line\nyet_another_line\nsame_line\nanother_line\n"), 0644)
-	FSUtil.WriteFile("testdir1/td2/f1", []byte("same_line\nsame_line\nanother_line\n"), 0644)
-	FSUtil.WriteFile("testdir2/td2/f1", []byte("same_line\nsame_line\nanother_line\n"), 0644)
-}
 
 func TestFindDuplicateLines(t *testing.T) {
 	stdin := "same_line\nyet_another_line\nsame_line\nanother_line\nsame_line\n"
