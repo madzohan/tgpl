@@ -19,10 +19,28 @@ type LineStats struct {
 	count   int
 }
 
-func scan(scanner bufio.Scanner, filename string, stats map[string]*LineStats) {
+type OrderedMap struct {
+	Lines *[]string
+	M     map[string]*LineStats
+}
+
+func (orderedMap *OrderedMap) Set(line string, lineStats *LineStats) {
+	_, present := orderedMap.M[line]
+	orderedMap.M[line] = lineStats
+	if !present {
+		*orderedMap.Lines = append(*orderedMap.Lines, line)
+	}
+}
+
+func (orderedMap *OrderedMap) Get(line string) (lineStats *LineStats, exist bool) {
+	lineStats, exist = orderedMap.M[line]
+	return
+}
+
+func scan(scanner bufio.Scanner, filename string, stats OrderedMap) {
 	for scanner.Scan() {
 		line := scanner.Text()
-		if lineStats, exist := stats[line]; exist {
+		if lineStats, exist := stats.Get(line); exist {
 			lineStats.count++
 			if filename != "" {
 				fileset := lineStats.fileset.(map[string]struct{})
@@ -33,7 +51,7 @@ func scan(scanner bufio.Scanner, filename string, stats map[string]*LineStats) {
 		} else {
 			fileset := make(map[string]struct{})
 			fileset[filename] = struct{}{}
-			stats[line] = &LineStats{fileset: fileset, count: 1}
+			stats.Set(line, &LineStats{fileset: fileset, count: 1})
 		}
 	}
 }
@@ -49,8 +67,9 @@ func getFileScanner(reader afero.File) (scanner *bufio.Scanner, filename string)
 	return scanner, filename
 }
 
-func PrintStats(stats map[string]*LineStats) {
-	for line, linestats := range stats {
+func PrintStats(stats OrderedMap) {
+	for _, line := range *stats.Lines {
+		linestats, _ := stats.Get(line)
 		if linestats.count > 1 {
 			fileset := linestats.fileset.(map[string]struct{})
 			filenamesSorted := []string{}
@@ -64,15 +83,14 @@ func PrintStats(stats map[string]*LineStats) {
 			} else {
 				fmt.Printf("\nline: %s, count: %x", line, linestats.count)
 			}
-
 		}
 	}
 }
 
-func PopulateLineStats(filenames []string, FS afero.Fs, reader io.Reader, lineStats map[string]*LineStats) {
+func PopulateLineStats(filenames []string, FS afero.Fs, reader io.Reader, stats OrderedMap) {
 	if len(filenames) == 0 {
 		scanner := getStdScanner(reader)
-		scan(*scanner, "", lineStats)
+		scan(*scanner, "", stats)
 	} else {
 		for _, filename := range filenames {
 			file, err := FS.Open(filename)
@@ -81,7 +99,7 @@ func PopulateLineStats(filenames []string, FS afero.Fs, reader io.Reader, lineSt
 				continue
 			}
 			scanner, filename := getFileScanner(file)
-			scan(*scanner, filename, lineStats)
+			scan(*scanner, filename, stats)
 			_ = file.Close()
 		}
 	}
@@ -89,7 +107,7 @@ func PopulateLineStats(filenames []string, FS afero.Fs, reader io.Reader, lineSt
 
 func FindDuplicateLines(FS afero.Fs, reader io.Reader) {
 	filenames := os.Args[1:]
-	lineStats := make(map[string]*LineStats)
-	PopulateLineStats(filenames, FS, reader, lineStats)
-	PrintStats(lineStats)
+	stats := OrderedMap{Lines: &[]string{}, M: make(map[string]*LineStats)}
+	PopulateLineStats(filenames, FS, reader, stats)
+	PrintStats(stats)
 }

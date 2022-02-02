@@ -27,13 +27,13 @@ func walk(path string, info os.FileInfo, err error) error {
 }
 
 func FindDuplicateLines(FS afero.Fs, reader io.Reader) {
-	lineStats := make(map[string]*dup2.LineStats)
+	stats := dup2.OrderedMap{Lines: &[]string{}, M: make(map[string]*dup2.LineStats)}
 	for _, dirname := range os.Args[1:] {
 		err := afero.Walk(FS, dirname, walk)
 		if err != nil {
 			return
 		}
 	}
-	dup2.PopulateLineStats(filePaths, FS, reader, lineStats)
-	dup2.PrintStats(lineStats)
+	dup2.PopulateLineStats(filePaths, FS, reader, stats)
+	dup2.PrintStats(stats)
 }
