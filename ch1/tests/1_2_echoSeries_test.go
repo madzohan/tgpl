@@ -3,12 +3,12 @@ package tests
 import (
 	"testing"
 
-	"github.com/madzohan/tgpl/ch1/echoSeries/echo1"
-	"github.com/madzohan/tgpl/ch1/echoSeries/echo2"
-	"github.com/madzohan/tgpl/ch1/echoSeries/echo3"
+	"github.com/madzohan/tgpl/ch1/1_2_echoSeries/echo1"
+	"github.com/madzohan/tgpl/ch1/1_2_echoSeries/echo2"
+	"github.com/madzohan/tgpl/ch1/1_2_echoSeries/echo3"
 
-	exercise1_1 "github.com/madzohan/tgpl/ch1/echoSeries/exercise1.1"
-	exercise1_2 "github.com/madzohan/tgpl/ch1/echoSeries/exercise1.2"
+	"github.com/madzohan/tgpl/ch1/1_2_echoSeries/exercise1_1"
+	"github.com/madzohan/tgpl/ch1/1_2_echoSeries/exercise1_2"
 )
 
 func TestPrint(t *testing.T) {

@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/madzohan/tgpl/ch1/lissajous_series/lis"
+	"github.com/madzohan/tgpl/ch1/1_4_lissajousSeries/lis"
 )
 
 func TestLissajous(t *testing.T) {

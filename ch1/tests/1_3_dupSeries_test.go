@@ -5,10 +5,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/madzohan/tgpl/ch1/dupSeries/dup1"
-	"github.com/madzohan/tgpl/ch1/dupSeries/dup2"
-	"github.com/madzohan/tgpl/ch1/dupSeries/dup3"
-	exercise1_4 "github.com/madzohan/tgpl/ch1/dupSeries/exercise1.4"
+	"github.com/madzohan/tgpl/ch1/1_3_dupSeries/dup1"
+	"github.com/madzohan/tgpl/ch1/1_3_dupSeries/dup2"
+	"github.com/madzohan/tgpl/ch1/1_3_dupSeries/dup3"
+	"github.com/madzohan/tgpl/ch1/1_3_dupSeries/exercise1_4"
 )
 
 func TestFindDuplicateLines(t *testing.T) {
@@ -62,19 +62,19 @@ func TestFindDuplicateLines(t *testing.T) {
 			"dup3: open file_not_exist: file does not exist\n")
 	})
 
-	t.Run("exercise1.4-files", func(t *testing.T) {
-		outReader, outWriter, errReader, errWriter := SetUp([]string{"exercise1.4-files", "testdir1", "testdir2"})
+	t.Run("exercise1_4-files", func(t *testing.T) {
+		outReader, outWriter, errReader, errWriter := SetUp([]string{"exercise1_4-files", "testdir1", "testdir2"})
 		exercise1_4.FindDuplicateLines(FS, os.Stdin)
 		TearDown(t, outReader, outWriter, errReader, errWriter,
 			"\nline: same_line, count: 6, filenames: testdir1/f1, testdir1/td2/f1, testdir2/td2/f1"+
 				"\nline: another_line, count: 3, filenames: testdir1/f1, testdir1/td2/f1, testdir2/td2/f1", "")
 	})
 
-	t.Run("exercise1.4-files-stderr", func(t *testing.T) {
-		outReader, outWriter, errReader, errWriter := SetUp([]string{"exercise1.4-files", "dir_not_exist"})
+	t.Run("exercise1_4-files-stderr", func(t *testing.T) {
+		outReader, outWriter, errReader, errWriter := SetUp([]string{"exercise1_4-files", "dir_not_exist"})
 		exercise1_4.FindDuplicateLines(FS, os.Stdin)
 		TearDown(t, outReader, outWriter, errReader, errWriter, "",
-			"exercise1.4: open dir_not_exist: file does not exist\n")
+			"exercise1_4: open dir_not_exist: file does not exist\n")
 	})
 }
 

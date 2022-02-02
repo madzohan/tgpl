@@ -2,14 +2,14 @@
 // also it should display all files in which each duplicated line occures
 // file search recursively through the directory
 
-package dup4
+package exercise1_4
 
 import (
 	"fmt"
 	"io"
 	"os"
 
-	"github.com/madzohan/tgpl/ch1/dupSeries/dup2"
+	"github.com/madzohan/tgpl/ch1/1_3_dupSeries/dup2"
 	"github.com/spf13/afero"
 )
 
@@ -17,7 +17,7 @@ var filePaths []string
 
 func walk(path string, info os.FileInfo, err error) error {
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "exercise1.4: %v\n", err)
+		fmt.Fprintf(os.Stderr, "exercise1_4: %v\n", err)
 		return err
 	}
 	if !info.IsDir() {
