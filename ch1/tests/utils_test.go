@@ -9,11 +9,10 @@ import (
 	"github.com/spf13/afero"
 )
 
-var osArgs, osStdout = os.Args, os.Stdout
-
 var (
-	FS     afero.Fs
-	FSUtil *afero.Afero
+	FS               afero.Fs
+	FSUtil           *afero.Afero
+	osArgs, osStdout = os.Args, os.Stdout
 )
 
 func init() {
@@ -63,10 +62,10 @@ func TearDown(c testing.TB, outReader *os.File, outWriter *os.File,
 		// copy the output in a separate goroutine so printing can't block indefinitely
 		go func(reader *os.File, stdChan chan string) {
 			var buf bytes.Buffer
-			_, _ = io.Copy(&buf, i.filebuf.reader)
+			io.Copy(&buf, i.filebuf.reader)
 			stdChan <- buf.String()
 		}(i.filebuf.reader, stdChan)
-		_ = i.filebuf.writer.Close()
+		i.filebuf.writer.Close()
 		got := <-stdChan
 		if i.expected != got {
 			c.Errorf("%s expected %s; got %s", i.expectedPrefix, i.expected, got)
