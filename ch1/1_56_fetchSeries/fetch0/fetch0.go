@@ -1,4 +1,5 @@
-package fetch
+// Experimental experience before actually reading the chapters =)
+package fetch0
 
 import (
 	"bufio"
@@ -32,7 +33,7 @@ func (h *Http) Fetch(urls []string) <-chan Result {
 	for _, url := range urls {
 		resp, err = h.getResponse(url)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "fetch(url=%v) GET: %s\n", url, err)
+			fmt.Fprintf(os.Stderr, "Fetch: while getting url=\"%s\" error occurs: \"%v\"\n", url, err)
 			go func() {
 				ch <- Result{Text: "", Error: err}
 			}()

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/madzohan/tgpl/ch1/1_56_fetchSeries/fetch"
+	"github.com/madzohan/tgpl/ch1/1_56_fetchSeries/fetch0"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 		fmt.Println("Please type in urls in args!")
 		return
 	}
-	h := fetch.NewHttp(http.Get)
+	h := fetch0.NewHttp(http.Get)
 	respGen := h.Fetch(urls)
 	for _, url := range urls {
 		respBody := <-respGen

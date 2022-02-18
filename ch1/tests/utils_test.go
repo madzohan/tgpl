@@ -10,9 +10,9 @@ import (
 )
 
 var (
-	FS               afero.Fs
-	FSUtil           *afero.Afero
-	osArgs, osStdout = os.Args, os.Stdout
+	FS                         afero.Fs
+	FSUtil                     *afero.Afero
+	osArgs, osStdout, osStderr = os.Args, os.Stdout, os.Stderr
 )
 
 func init() {
@@ -68,8 +68,8 @@ func TearDown(c testing.TB, outReader *os.File, outWriter *os.File,
 		i.filebuf.writer.Close()
 		got := <-stdChan
 		if i.expected != got {
-			c.Errorf("%s expected %s; got %s", i.expectedPrefix, i.expected, got)
+			c.Errorf("In \"%s\" expected \"%s\"; got \"%s\"", i.expectedPrefix, i.expected, got)
 		}
 	}
-	os.Args, os.Stdout = osArgs, osStdout
+	os.Args, os.Stdout, os.Stderr = osArgs, osStdout, osStderr
 }
