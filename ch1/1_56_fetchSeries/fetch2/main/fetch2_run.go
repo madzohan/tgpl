@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/madzohan/tgpl/ch1/1_56_fetchSeries/fetch1"
+	"github.com/madzohan/tgpl/ch1/1_56_fetchSeries/fetch2"
 )
 
 func main() {
@@ -14,5 +15,5 @@ func main() {
 		fmt.Println("Please type in urls in args!")
 		return
 	}
-	fetch1.NewURLsFetcher(urls, http.Get, os.Stdout, os.Stderr, nil).Fetch()
+	fetch1.NewURLsFetcher(urls, http.Get, os.Stdout, os.Stderr, fetch2.PrintResponse).Fetch()
 }

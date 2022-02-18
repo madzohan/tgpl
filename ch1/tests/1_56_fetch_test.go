@@ -3,6 +3,7 @@ package tests
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 
 	fetch0 "github.com/madzohan/tgpl/ch1/1_56_fetchSeries/fetch0"
 	fetch1 "github.com/madzohan/tgpl/ch1/1_56_fetchSeries/fetch1"
+	"github.com/madzohan/tgpl/ch1/1_56_fetchSeries/fetch2"
 )
 
 var getterErrorStr, readerErrorStr string = "getter error", "reader error"
@@ -28,12 +30,9 @@ func mockGetPage(url string) (resp *http.Response, err error) {
 	return resp, err
 }
 
-func mockReadResponseBody(body io.Reader) (buf []byte, err error) {
-	buf, err = io.ReadAll(body)
-	if string(buf) == readerErrorStr {
-		err = errors.New(readerErrorStr)
-		return []byte{}, err
-	}
+func mockPrintResponse(response *fetch1.Response, outWrite io.Writer) (err error) {
+	b, _ := ioutil.ReadAll(io.NopCloser(response.Body))
+	err = errors.New(string(b))
 	return
 }
 
@@ -76,25 +75,38 @@ func TestFetch1(t *testing.T) {
 	type args struct {
 		urls []string
 	}
-	tests := []struct {
+	type testArgs struct {
 		name          string
 		args          args
 		wantRespBody  string
 		wantErrorText string
-	}{
+	}
+	tests := []testArgs{
 		{"fetch1-ok", args{[]string{"test1"}}, "body\n", ""},
 		{"fetch1-error-while-getting-url", args{[]string{getterErrorStr}}, "",
-			strings.Join([]string{"Fetch: while getting url=\"", getterErrorStr, "\" error occurs: \"", getterErrorStr, "\"\n"}, "")},
-		{"fetch1-error-while-reading-response", args{[]string{readerErrorStr}}, "",
-			strings.Join([]string{"Fetch: while reading response from url=\"", readerErrorStr, "\" error occurs: \"", readerErrorStr, "\"\n"}, "")},
+			fmt.Sprint("Fetch: while getting url=\"", getterErrorStr, "\" error occurs: \"", getterErrorStr, "\"\n")},
 		{"fetch1-multiple-urls", args{[]string{"test1", "test2"}}, "body\nbody\n", ""},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			outReader, outWriter, errReader, errWriter := SetUp([]string{})
-			fetch1.Fetch(tt.args.urls, mockGetPage, mockReadResponseBody, outWriter)
+			fetch1.NewURLsFetcher(tt.args.urls, mockGetPage, outWriter, errWriter, nil).Fetch()
+			TearDown(t, outReader, outWriter, errReader, errWriter, tt.wantRespBody, tt.wantErrorText)
+		})
+		tt.name = strings.ReplaceAll(tt.name, "1", "2")
+		t.Run(tt.name, func(t *testing.T) {
+			outReader, outWriter, errReader, errWriter := SetUp([]string{})
+			fetch1.NewURLsFetcher(tt.args.urls, mockGetPage, outWriter, errWriter, fetch2.PrintResponse).Fetch()
 			TearDown(t, outReader, outWriter, errReader, errWriter, tt.wantRespBody, tt.wantErrorText)
 		})
 	}
+	tt := testArgs{"fetch1-error-while-reading-response", args{[]string{readerErrorStr}}, "",
+		fmt.Sprint("Fetch: while reading response from url=\"", readerErrorStr, "\" error occurs: \"", readerErrorStr, "\"\n")}
+
+	t.Run(tt.name, func(t *testing.T) {
+		outReader, outWriter, errReader, errWriter := SetUp([]string{})
+		fetch1.NewURLsFetcher(tt.args.urls, mockGetPage, outWriter, errWriter, mockPrintResponse).Fetch()
+		TearDown(t, outReader, outWriter, errReader, errWriter, tt.wantRespBody, tt.wantErrorText)
+	})
 
 }
