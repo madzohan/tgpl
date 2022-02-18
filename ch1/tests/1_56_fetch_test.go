@@ -13,6 +13,7 @@ import (
 	fetch0 "github.com/madzohan/tgpl/ch1/1_56_fetchSeries/fetch0"
 	fetch1 "github.com/madzohan/tgpl/ch1/1_56_fetchSeries/fetch1"
 	"github.com/madzohan/tgpl/ch1/1_56_fetchSeries/fetch2"
+	"github.com/madzohan/tgpl/ch1/1_56_fetchSeries/fetch3"
 )
 
 var getterErrorStr, readerErrorStr string = "getter error", "reader error"
@@ -34,6 +35,10 @@ func mockPrintResponse(response *fetch1.Response, outWrite io.Writer) (err error
 	b, _ := ioutil.ReadAll(io.NopCloser(response.Body))
 	err = errors.New(string(b))
 	return
+}
+
+func mockMakeURL(url string) string {
+	return url
 }
 
 func TestFetch0(t *testing.T) {
@@ -90,23 +95,29 @@ func TestFetch1(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			outReader, outWriter, errReader, errWriter := SetUp([]string{})
-			fetch1.NewURLsFetcher(tt.args.urls, mockGetPage, outWriter, errWriter, nil).Fetch()
+			fetch1.NewURLsFetcher(tt.args.urls, mockGetPage, outWriter, errWriter, nil, mockMakeURL).Fetch()
 			TearDown(t, outReader, outWriter, errReader, errWriter, tt.wantRespBody, tt.wantErrorText)
 		})
 		tt.name = strings.ReplaceAll(tt.name, "1", "2")
 		t.Run(tt.name, func(t *testing.T) {
 			outReader, outWriter, errReader, errWriter := SetUp([]string{})
-			fetch1.NewURLsFetcher(tt.args.urls, mockGetPage, outWriter, errWriter, fetch2.PrintResponse).Fetch()
+			fetch1.NewURLsFetcher(tt.args.urls, mockGetPage, outWriter, errWriter, fetch2.PrintResponse, mockMakeURL).Fetch()
 			TearDown(t, outReader, outWriter, errReader, errWriter, tt.wantRespBody, tt.wantErrorText)
 		})
 	}
+
 	tt := testArgs{"fetch1-error-while-reading-response", args{[]string{readerErrorStr}}, "",
 		fmt.Sprint("Fetch: while reading response from url=\"", readerErrorStr, "\" error occurs: \"", readerErrorStr, "\"\n")}
-
 	t.Run(tt.name, func(t *testing.T) {
 		outReader, outWriter, errReader, errWriter := SetUp([]string{})
-		fetch1.NewURLsFetcher(tt.args.urls, mockGetPage, outWriter, errWriter, mockPrintResponse).Fetch()
+		fetch1.NewURLsFetcher(tt.args.urls, mockGetPage, outWriter, errWriter, mockPrintResponse, mockMakeURL).Fetch()
 		TearDown(t, outReader, outWriter, errReader, errWriter, tt.wantRespBody, tt.wantErrorText)
 	})
 
+	tt = testArgs{"fetch1-make-url", args{[]string{"test.com"}}, "body\nHTTP status code=0\n", ""}
+	t.Run(tt.name, func(t *testing.T) {
+		outReader, outWriter, errReader, errWriter := SetUp([]string{})
+		fetch1.NewURLsFetcher(tt.args.urls, mockGetPage, outWriter, errWriter, fetch3.PrintResponse, nil).Fetch()
+		TearDown(t, outReader, outWriter, errReader, errWriter, tt.wantRespBody, tt.wantErrorText)
+	})
 }

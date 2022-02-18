@@ -14,5 +14,5 @@ func main() {
 		fmt.Println("Please type in urls in args!")
 		return
 	}
-	fetch1.NewURLsFetcher(urls, http.Get, os.Stdout, os.Stderr, nil).Fetch()
+	fetch1.NewURLsFetcher(urls, http.Get, os.Stdout, os.Stderr, nil, nil).Fetch()
 }
