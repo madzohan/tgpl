@@ -26,8 +26,8 @@ jobs:
       run: go get -v -t -d ./...
       
     - name: Run Unit tests
-      run: 'go test -v -cover -covermode=atomic -coverpkg=./... -coverprofile=coverage.txt.tmp ./... &&
-         cat coverage.txt.tmp | grep -v "_run.go" > coverage.txt'
+      run: go test -v -cover -covermode=atomic -coverpkg=./... -coverprofile=coverage.txt.tmp ./... && 
+          cat coverage.txt.tmp | grep -v "_run.go" > coverage.txt
 
     - name: Codecov
       uses: codecov/codecov-action@v2

@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+// Print prints os.Args to Stdout
+// using strings.Join
 func Print() {
 	fmt.Println(strings.Join(os.Args[1:], " "))
 }
