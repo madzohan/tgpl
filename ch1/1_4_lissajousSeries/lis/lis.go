@@ -32,6 +32,7 @@ func Lissajous(out io.Writer, palette []color.Color, dynamicPalette bool) {
 	freq := rand.Float64() * 3.0
 	anim := gif.GIF{LoopCount: nframes}
 	phase := 0.0
+
 	for i := 0; i < nframes; i++ {
 		rect := image.Rect(0, 0, 2*size+1, 2*size+1)
 		if dynamicPalette {
@@ -40,19 +41,19 @@ func Lissajous(out io.Writer, palette []color.Color, dynamicPalette bool) {
 		}
 		img := image.NewPaletted(rect, palette)
 		for t := 0.0; t < cycles*2.0*math.Pi; t += res {
-			x := math.Sin(t)
-			y := math.Sin(t*freq + phase)
+			xAxis := math.Sin(t)
+			yAxis := math.Sin(t*freq + phase)
 			if dynamicPalette {
 				r, g, b := uint8(3*t), uint8(t), uint8(2*t)
 				colorIndex = uint8(color.Palette.Index(palette, color.RGBA{r, g, b, 1}))
 			}
-			img.SetColorIndex(size+int(x*size+0.5), size+int(y*size+0.5), colorIndex)
+			img.SetColorIndex(size+int(xAxis*size+0.5), size+int(yAxis*size+0.5), colorIndex)
 		}
 		phase += 0.1
 		anim.Delay = append(anim.Delay, delay)
 		anim.Image = append(anim.Image, img)
 	}
-	gif.EncodeAll(out, &anim)
+	_ = gif.EncodeAll(out, &anim)
 }
 
 func LissajousToFile(filename string, palette []color.Color, dynamicPalette bool, fs afero.Fs) {
@@ -64,5 +65,5 @@ func LissajousToFile(filename string, palette []color.Color, dynamicPalette bool
 	}
 	defer f.Close()
 	Lissajous(f, palette, dynamicPalette)
-	f.Sync()
+	_ = f.Sync()
 }

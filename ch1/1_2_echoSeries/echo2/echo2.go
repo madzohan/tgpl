@@ -8,17 +8,20 @@ import (
 
 const sep = " "
 
+// Print prints os.Args to Stdout
+// using for range switch
 func Print() {
-	var s string
+	var echoStr string
+
 	for i, arg := range os.Args {
 		switch i {
 		case 0:
 			continue
 		case 1:
-			s = arg
+			echoStr = arg
 		default:
-			s += sep + arg
+			echoStr += sep + arg
 		}
 	}
-	fmt.Println(s)
+	fmt.Println(echoStr)
 }

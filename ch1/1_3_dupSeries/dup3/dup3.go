@@ -1,6 +1,3 @@
-//	Prints the count and text of lines that appear more than once
-//	Yet another approach of reading file - read entire input in memory
-// using afero.ReadFile
 package dup3
 
 import (
@@ -15,6 +12,7 @@ import (
 func scanBuf(data []byte, err error, stats map[string]int) {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "dup3: %v\n", err)
+
 		return
 	}
 	for _, line := range strings.Split(string(data), "\n") {
@@ -25,6 +23,9 @@ func scanBuf(data []byte, err error, stats map[string]int) {
 	}
 }
 
+// FindDuplicateLines prints the count and text of lines that appear more than once
+// Yet another approach of reading file - read entire input in memory
+// using afero.ReadFile
 func FindDuplicateLines(FS afero.Fs, reader io.Reader) {
 	stats := make(map[string]int)
 	files := os.Args[1:]
@@ -39,7 +40,7 @@ func FindDuplicateLines(FS afero.Fs, reader io.Reader) {
 	}
 	for line, count := range stats {
 		if count > 1 {
-			fmt.Printf("line: %s, count: %x", line, count)
+			fmt.Printf("\nline: %s, count: %x", line, count)
 		}
 	}
 }

@@ -1,6 +1,3 @@
-// 	Dup2 prints the count and text of lines that appear more than once
-// in the input, and filenames where they occurs (if input is from named files).
-// It reads from stdin or from a list of named files.
 package dup2
 
 import (
@@ -34,6 +31,7 @@ func (orderedMap *OrderedMap) Set(line string, lineStats *LineStats) {
 
 func (orderedMap *OrderedMap) Get(line string) (lineStats *LineStats, exist bool) {
 	lineStats, exist = orderedMap.M[line]
+
 	return
 }
 
@@ -58,12 +56,14 @@ func scan(scanner bufio.Scanner, filename string, stats OrderedMap) {
 
 func getStdScanner(reader io.Reader) (scanner *bufio.Scanner) {
 	scanner = bufio.NewScanner(reader)
+
 	return scanner
 }
 
 func getFileScanner(reader afero.File) (scanner *bufio.Scanner, filename string) {
 	filename = reader.Name()
 	scanner = bufio.NewScanner(reader)
+
 	return scanner, filename
 }
 
@@ -96,6 +96,7 @@ func PopulateLineStats(filenames []string, FS afero.Fs, reader io.Reader, stats 
 			file, err := FS.Open(filename)
 			if err != nil {
 				_, _ = fmt.Fprintf(os.Stderr, "dup: %v", err)
+
 				continue
 			}
 			scanner, filename := getFileScanner(file)
@@ -105,6 +106,9 @@ func PopulateLineStats(filenames []string, FS afero.Fs, reader io.Reader, stats 
 	}
 }
 
+// FindDuplicateLines prints the count and text of lines that appear more than once
+// in the input, and filenames where they occurs (if input is from named files).
+// Reads from stdin or from a list of named files.
 func FindDuplicateLines(FS afero.Fs, reader io.Reader) {
 	filenames := os.Args[1:]
 	stats := OrderedMap{Lines: &[]string{}, M: make(map[string]*LineStats)}
